@@ -168,9 +168,13 @@ export function TaskInputScreen({ onScheduleGenerated }: TaskInputScreenProps) {
 
       console.log('Calling Claude API with input:', userInput);
 
+      // Use local server for development, Supabase for production
+      const apiUrl = import.meta.env.VITE_API_URL || 
+        `https://${projectId}.supabase.co/functions/v1`;
+
       // Call Claude API via backend
       const response = await fetch(
-        `https://${projectId}.supabase.co/functions/v1/make-server-77657710/schedule-tasks`,
+        `${apiUrl}/make-server-77657710/schedule-tasks`,
         {
           method: 'POST',
           headers: {
