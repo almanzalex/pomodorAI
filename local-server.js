@@ -70,25 +70,44 @@ Please parse these tasks, understand my priorities and preferences, and organize
 
     console.log('Calling Claude API...');
 
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': apiKey,
-        'anthropic-version': '2023-06-01',
-      },
-      body: JSON.stringify({
-        model: 'claude-3-5-sonnet-20241022',
-        max_tokens: 2000,
-        system: systemPrompt,
-        messages: [
-          {
-            role: 'user',
-            content: userPrompt,
-          },
-        ],
-      }),
-    });
+    // Retry logic for overloaded API
+    let response;
+    let retries = 3;
+    let delay = 1000; // Start with 1 second delay
+
+    for (let i = 0; i < retries; i++) {
+      response = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': apiKey,
+          'anthropic-version': '2023-06-01',
+        },
+        body: JSON.stringify({
+          model: 'claude-3-haiku-20240307',
+          max_tokens: 2000,
+          system: systemPrompt,
+          messages: [
+            {
+              role: 'user',
+              content: userPrompt,
+            },
+          ],
+        }),
+      });
+
+      // If successful or not overloaded, break
+      if (response.ok || response.status !== 529) {
+        break;
+      }
+
+      // If overloaded and not last retry, wait and retry
+      if (i < retries - 1) {
+        console.log(`API overloaded, retrying in ${delay}ms... (attempt ${i + 2}/${retries})`);
+        await new Promise(resolve => setTimeout(resolve, delay));
+        delay *= 2; // Exponential backoff
+      }
+    }
 
     if (!response.ok) {
       const errorText = await response.text();
@@ -109,18 +128,36 @@ Please parse these tasks, understand my priorities and preferences, and organize
 
     // Extract the JSON from Claude's response
     const content = data.content[0].text;
+    console.log('Raw Claude response:', content);
 
     // Try to parse JSON from the response
     let scheduleData;
     try {
-      // Remove markdown code blocks if present
-      const jsonMatch = content.match(/```(?:json)?\s*([\s\S]*?)\s*```/) || [null, content];
-      const jsonString = jsonMatch[1].trim();
+      // Try different parsing strategies
+      let jsonString = content;
+
+      // Strategy 1: Remove markdown code blocks if present
+      const codeBlockMatch = content.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
+      if (codeBlockMatch) {
+        jsonString = codeBlockMatch[1].trim();
+      }
+
+      // Strategy 2: Find JSON object pattern
+      const jsonObjectMatch = jsonString.match(/\{[\s\S]*\}/);
+      if (jsonObjectMatch) {
+        jsonString = jsonObjectMatch[0];
+      }
+
+      console.log('Extracted JSON string:', jsonString);
       scheduleData = JSON.parse(jsonString);
     } catch (parseError) {
       console.error('Error parsing Claude response:', parseError);
       console.error('Claude response content:', content);
-      return res.status(500).json({ error: 'Failed to parse task schedule from AI response' });
+      return res.status(500).json({ 
+        error: 'Failed to parse task schedule from AI response',
+        details: parseError.message,
+        rawResponse: content
+      });
     }
 
     res.json({ schedule: scheduleData });

@@ -88,7 +88,7 @@ Please parse these tasks, understand my priorities and preferences, and organize
     console.log("Calling Claude API for task scheduling...");
     
     const claudePayload = {
-      model: "claude-3-5-sonnet-20241022",
+      model: "claude-3-haiku-20240307",
       max_tokens: 2000,
       system: systemPrompt,
       messages: [
