@@ -42,14 +42,12 @@ PomodorAI is an AI-powered study session planner that:
 - **Visual Progress Tracking**: See current task, upcoming tasks, completed tasks, and total pomodoros
 - **Break Reminders**: Clear visual indication when it's time to rest and recharge
 
-### ✅ Claude API Integration with Intelligent Fallback
+### ✅ Claude API Integration
 **Fully integrated** with Claude 3.5 Sonnet via Supabase Edge Functions:
 - Claude analyzes task descriptions to intelligently estimate difficulty, time, and priority
 - Optimizes task ordering based on Pomodoro best practices and cognitive load management
 - Backend endpoint: `/make-server-77657710/schedule-tasks`
 - Combines both plain text and structured input for comprehensive AI analysis
-- **Graceful fallback**: If Claude API is unavailable, uses local intelligent scheduling algorithm
-- Works perfectly for demos even without API credits!
 
 ## Tech Stack
 
@@ -87,11 +85,10 @@ npm run dev
 
 # Build for production
 npm run build
+
+# Deploy to Vercel
+vercel deploy
 ```
-
-**Deploy to Render**: Follow [RENDER_DEPLOYMENT_GUIDE.md](./RENDER_DEPLOYMENT_GUIDE.md)
-
-**Claude API Setup (Optional)**: See [CLAUDE_API_SETUP.md](./CLAUDE_API_SETUP.md) - App works perfectly without it!
 
 ## Hackathon Submission Checklist
 
@@ -119,4 +116,3 @@ MIT License - Built for Dartmouth BuildWithClaude Hackathon 2025
 ---
 
 **Note for Judges**: This app demonstrates a fully functional Pomodoro study system with intelligent task management. The local scheduling algorithm is ready to be replaced with Claude API calls for enhanced AI-powered task analysis and optimization.
-  
