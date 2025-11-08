@@ -1,27 +1,21 @@
-# Setting up Environment Variables in Render
+# Setting up Environment Variables
 
-## For Supabase Edge Functions (Production)
+## For Supabase Edge Functions (Production) ✅ CONFIGURED
 
-Since you're deploying a static site to Render, the Claude API calls need to go through Supabase Edge Functions. You need to set the API key in Supabase:
+The Claude API key has been set in Supabase. The Edge Function is deployed and ready to use.
 
-### Option 1: Supabase Dashboard (Easiest)
+### To update the key in the future:
+
+#### Option 1: Supabase Dashboard
 1. Go to https://supabase.com/dashboard/project/nybbpmsbjaofoklgyyor
 2. Click **Edge Functions** in the sidebar
 3. Click **Settings** or **Secrets**
-4. Add a new secret:
-   - Name: `CLAUDE_API_KEY`
-   - Value: `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`
+4. Update the `CLAUDE_API_KEY` secret
 
-### Option 2: Supabase CLI
+#### Option 2: Supabase CLI
 ```bash
-# Install Supabase CLI
-brew install supabase/tap/supabase
-
-# Login
-supabase login
-
 # Set the secret
-supabase secrets set CLAUDE_API_KEY=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 --project-ref nybbpmsbjaofoklgyyor
+supabase secrets set CLAUDE_API_KEY=your_new_key_here --project-ref nybbpmsbjaofoklgyyor
 ```
 
 ### Deploy the Edge Function
@@ -35,10 +29,24 @@ supabase functions deploy make-server-77657710 --project-ref nybbpmsbjaofoklgyyo
 
 ## For Local Development
 
-The local server (`local-server.js`) has a fallback API key hardcoded for development purposes only. This works locally but won't be pushed to GitHub.
+Create a `.env` file in the project root with your Claude API key:
+
+```bash
+CLAUDE_API_KEY=your_claude_api_key_here
+```
+
+The local server will read this file when running `npm run server`.
 
 ## Current Setup
 
-- **Local development**: Uses `local-server.js` on port 3333 (API key has fallback)
-- **Production**: Uses Supabase Edge Functions (requires API key to be set in Supabase dashboard)
+- **Local development**: 
+  - Uses `local-server.js` on port 3333 
+  - Requires `.env` file with `CLAUDE_API_KEY`
+  - Set `VITE_API_URL=http://localhost:3333` in `.env.local` to use local backend
+  
+- **Production**: 
+  - Uses Supabase Edge Functions (✅ deployed)
+  - Claude API key configured in Supabase secrets (✅ set)
+  - No environment variables needed in Render
+  
 - **Frontend**: Automatically detects environment via `VITE_API_URL` env variable
