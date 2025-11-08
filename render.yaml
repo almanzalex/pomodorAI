@@ -1,0 +1,22 @@
+services:
+  # Frontend - Static Site
+  - type: web
+    name: pomodorAI-frontend
+    env: static
+    buildCommand: npm install && npm run build
+    staticPublishPath: ./dist
+    envVars:
+      - key: NODE_VERSION
+        value: 20
+
+  # Backend - Web Service
+  - type: web
+    name: pomodorAI-backend
+    env: node
+    buildCommand: npm install
+    startCommand: node local-server.js
+    envVars:
+      - key: NODE_VERSION
+        value: 20
+      - key: CLAUDE_API_KEY
+        sync: false
