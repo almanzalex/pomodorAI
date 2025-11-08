@@ -40,7 +40,11 @@ app.post("/make-server-77657710/schedule-tasks", async (c) => {
       return c.json({ error: "User input is required" }, 400);
     }
 
-    const apiKey = "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";
+    const apiKey = Deno.env.get("CLAUDE_API_KEY") || "";
+    if (!apiKey) {
+      console.log("Error: CLAUDE_API_KEY environment variable is not set");
+      return c.json({ error: "Claude API key not configured" }, 500);
+    }
     console.log("API key found, length:", apiKey.length);
 
     // Construct the prompt for Claude

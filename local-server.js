@@ -23,7 +23,11 @@ app.post('/make-server-77657710/schedule-tasks', async (req, res) => {
       return res.status(400).json({ error: 'User input is required' });
     }
 
-    const apiKey = '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';
+    const apiKey = process.env.CLAUDE_API_KEY || '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';
+    if (!apiKey) {
+      console.error('CLAUDE_API_KEY not found');
+      return res.status(500).json({ error: 'Claude API key not configured' });
+    }
 
     // Construct the prompt for Claude
     const systemPrompt = `You are a task scheduling assistant that helps users organize their tasks using the Pomodoro method. 
